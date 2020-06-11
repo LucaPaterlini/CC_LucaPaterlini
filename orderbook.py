@@ -2,7 +2,8 @@
 that expose the functional of adding,updating and cancelling and order and retrieving
 the best of ask and bid orders"""
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from recordclass import recordclass
 
 DEC = 5
 ASK = "S"
@@ -11,7 +12,7 @@ CANCEL = "c"
 UPDATE = "u"
 ADD = "a"
 
-Order = namedtuple('Order', ['order_id', 'timestamp', 'ticker', 'side', 'price', 'size'])
+Order = recordclass('Order', ['order_id', 'timestamp', 'ticker', 'side', 'price', 'size'])
 
 
 class OrderBook:
@@ -38,14 +39,14 @@ class OrderBook:
     def _update(self, order_id: str, size: int):
         """ update the size of an order """
         assert size > 0
-        self.orders_dict[order_id] = self.orders_dict[order_id]._replace(size=size)
+        self.orders_dict[order_id].size = size
 
     def _add(self, order: Order):
         """ add an order to the book """
         assert int(order.size) > 0
         assert float(order.price) > 0
         tmp_price = int(float(order.price)*10**DEC)
-        order = order._replace(price=tmp_price)
+        order.price = tmp_price
         self.orders_dict[order.order_id] = order
         if order.side == ASK:
             if self.min_ask[order.ticker] == 0:
